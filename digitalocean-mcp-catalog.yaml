@@ -1,0 +1,233 @@
+name: digitalocean-mcp
+title: DigitalOcean MCP Server
+description: |
+  An MCP (Model Context Protocol) server that provides tools to interact with the DigitalOcean API v2.
+  This server enables you to manage DigitalOcean resources including droplets, snapshots, regions, sizes,
+  SSH keys, and account information using API token authentication.
+
+version: 1.0.0
+author: Your Name
+license: MIT
+
+# Server runtime configuration
+runtime:
+  type: stdio
+  command: python
+  args:
+    - mcp_server.py
+  env:
+    - key: DIGITALOCEAN_API_TOKEN
+      name: DigitalOcean API Token
+      required: true
+      sensitive: true
+      description: |
+        Your DigitalOcean API token for authenticating API requests.
+        Get your token from: https://cloud.digitalocean.com/account/api/tokens
+
+# Docker runtime configuration (alternative)
+docker:
+  image: digitalocean-mcp-server
+  command: []
+  args: []
+  env:
+    - key: DIGITALOCEAN_API_TOKEN
+      name: DigitalOcean API Token
+      required: true
+      sensitive: true
+      description: |
+        Your DigitalOcean API token for authenticating API requests.
+        Get your token from: https://cloud.digitalocean.com/account/api/tokens
+
+# Available tools
+tools:
+  - name: do_list_regions
+    description: List all available DigitalOcean regions
+    parameters: {}
+    
+  - name: do_list_sizes
+    description: List all available droplet sizes (including GPU sizes)
+    parameters:
+      gpu_only:
+        type: boolean
+        description: If true, only return GPU-enabled sizes
+        default: false
+        required: false
+    
+  - name: do_list_snapshots
+    description: List all available snapshots in your DigitalOcean account
+    parameters: {}
+    
+  - name: do_get_snapshot
+    description: Get detailed information about a specific snapshot by ID
+    parameters:
+      snapshot_id:
+        type: string
+        description: Snapshot ID or slug
+        required: true
+    
+  - name: do_list_droplets
+    description: List all droplets in your DigitalOcean account
+    parameters: {}
+    
+  - name: do_get_droplet
+    description: Get detailed information about a specific droplet by ID
+    parameters:
+      droplet_id:
+        type: integer
+        description: Droplet ID
+        required: true
+    
+  - name: do_create_droplet
+    description: Create a new droplet on DigitalOcean
+    parameters:
+      name:
+        type: string
+        description: Droplet name
+        required: true
+      region:
+        type: string
+        description: Region slug (e.g., 'nyc1', 'sfo3')
+        required: true
+      size:
+        type: string
+        description: Droplet size slug (e.g., 's-1vcpu-1gb', 'g-2vcpu-16gb' for GPU)
+        required: true
+      image:
+        type: string
+        description: Image ID, snapshot ID, or image slug
+        required: true
+      ssh_keys:
+        type: array
+        items:
+          type: string
+        description: Optional list of SSH key IDs or fingerprints
+        required: false
+      tags:
+        type: array
+        items:
+          type: string
+        description: Optional list of tags
+        required: false
+      user_data:
+        type: string
+        description: Optional cloud-init user data script
+        required: false
+      monitoring:
+        type: boolean
+        description: Enable monitoring
+        default: false
+        required: false
+      ipv6:
+        type: boolean
+        description: Enable IPv6
+        default: false
+        required: false
+      private_networking:
+        type: boolean
+        description: Enable private networking
+        default: true
+        required: false
+    
+  - name: do_delete_droplet
+    description: Delete a droplet by ID (permanent action)
+    parameters:
+      droplet_id:
+        type: integer
+        description: Droplet ID to delete
+        required: true
+    
+  - name: do_list_ssh_keys
+    description: List all SSH keys in your DigitalOcean account
+    parameters: {}
+    
+  - name: do_get_account_info
+    description: Get account information and details
+    parameters: {}
+
+# Metadata
+metadata:
+  categories:
+    - Cloud Management
+    - Infrastructure as Code
+    - DigitalOcean
+    - DevOps
+  tags:
+    - digitalocean
+    - droplets
+    - cloud
+    - infrastructure
+    - api
+    - gpu
+  homepage: https://github.com/frontsidebus/GPU_Droplet_lab
+  repository: https://github.com/frontsidebus/GPU_Droplet_lab
+  documentation: https://github.com/frontsidebus/GPU_Droplet_lab/blob/master/MCP_SERVER_README.md
+  issues: https://github.com/frontsidebus/GPU_Droplet_lab/issues
+
+# Installation instructions
+installation:
+  type: local
+  requirements:
+    - Python 3.11 or higher
+    - Docker (optional, for containerized deployment)
+  steps:
+    - description: Install Python dependencies
+      command: pip install -r requirements.txt
+    - description: Set environment variable
+      command: export DIGITALOCEAN_API_TOKEN="your-token-here"
+    - description: Or use Docker
+      command: docker build -t digitalocean-mcp-server .
+
+# Usage examples
+examples:
+  - name: List all droplets
+    description: Get a list of all droplets in your account
+    tool: do_list_droplets
+    parameters: {}
+    
+  - name: Create a GPU droplet
+    description: Create a GPU-optimized droplet from a snapshot
+    tool: do_create_droplet
+    parameters:
+      name: "my-gpu-server"
+      region: "nyc1"
+      size: "g-2vcpu-16gb"
+      image: "snapshot-id-12345"
+      monitoring: true
+      private_networking: true
+      
+  - name: List GPU sizes only
+    description: Get only GPU-enabled droplet sizes
+    tool: do_list_sizes
+    parameters:
+      gpu_only: true
+
+# Configuration for MCP clients
+clientConfig:
+  # For Cursor
+  cursor:
+    command: python
+    args:
+      - mcp_server.py
+    env:
+      DIGITALOCEAN_API_TOKEN: "${DIGITALOCEAN_API_TOKEN}"
+  
+  # For Claude Desktop
+  claude:
+    command: python
+    args:
+      - mcp_server.py
+    env:
+      DIGITALOCEAN_API_TOKEN: "${DIGITALOCEAN_API_TOKEN}"
+  
+  # Docker configuration
+  docker:
+    command: docker
+    args:
+      - run
+      - -i
+      - --rm
+      - -e
+      - DIGITALOCEAN_API_TOKEN=${DIGITALOCEAN_API_TOKEN}
+      - digitalocean-mcp-server
+    env:
+      DIGITALOCEAN_API_TOKEN: "${DIGITALOCEAN_API_TOKEN}"
