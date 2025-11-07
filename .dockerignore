@@ -1,0 +1,51 @@
+# Git files
+.git
+.gitignore
+.gitattributes
+
+# Python cache
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info
+dist
+build
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Documentation
+*.md
+!README.md
+
+# Config files (may contain sensitive data)
+mcp_config.json
+*.env
+.env*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test files
+*.test.py
+test_*
+tests/
+
+# Other
+*.log
+*.tmp

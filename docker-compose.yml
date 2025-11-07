@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  digitalocean-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: digitalocean-mcp-server
+    stdin_open: true
+    tty: true
+    environment:
+      # Set DIGITALOCEAN_API_TOKEN via environment variable or .env file
+      # Create a .env file with: DIGITALOCEAN_API_TOKEN=your-token-here
+      - DIGITALOCEAN_API_TOKEN=${DIGITALOCEAN_API_TOKEN}
+    # The MCP server communicates via stdio, so no ports are needed
+    # Restart policy
+    restart: unless-stopped
+
