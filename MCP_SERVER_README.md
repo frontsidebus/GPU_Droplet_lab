@@ -244,7 +244,7 @@ Update your MCP client configuration to use Docker:
         "-i",
         "--rm",
         "-e",
-        "DIGITALOCEAN_API_TOKEN=your-api-token-here",
+        "DIGITALOCEAN_API_TOKEN=$DIGITALOCEAN_API_TOKEN",
         "digitalocean-mcp-server"
       ]
     }
@@ -271,6 +271,70 @@ Alternatively, check the [MCP Python SDK documentation](https://github.com/model
 2. **Set up your DigitalOcean API token:**
    - See the [Setting Up Your DigitalOcean API Token](#setting-up-your-digitalocean-api-token) section above for detailed instructions
    - Set the `DIGITALOCEAN_API_TOKEN` environment variable using the methods described above
+
+## MCP Catalog Configuration
+
+A catalog YAML file (`digitalocean-mcp-catalog.yaml`) is provided for easy integration with MCP clients that support catalog-based server registration.
+
+### Using the Catalog File
+
+The catalog file contains all the necessary configuration for the DigitalOcean MCP server, including:
+- Server metadata and description
+- All available tools and their parameters
+- Environment variable configuration
+- Installation instructions
+- Usage examples
+- Client-specific configurations (Cursor, Claude Desktop, Docker)
+
+**To use with MCP clients that support catalogs:**
+1. Reference the catalog file in your MCP client configuration
+2. Ensure the `DIGITALOCEAN_API_TOKEN` environment variable is set
+3. The client will automatically configure the server based on the catalog
+
+**Note:** Update the `homepage`, `repository`, and `documentation` URLs in the catalog file to match your actual repository location.
+
+### Docker Desktop MCP Gateway
+
+Docker Desktop (v4.32 or later) includes an MCP Gateway that can consume custom catalogs. The steps below assume the Docker MCP Toolkit feature is enabled in Docker Desktop (Settings → Beta features → **Enable Docker MCP Toolkit**).
+
+1. **Build the Docker image (optional but recommended):**
+   ```bash
+   docker build -t digitalocean-mcp-server .
+   ```
+
+2. **Add the catalog to Docker's MCP gateway:**
+   ```bash
+   docker mcp catalog add my-catalog digitalocean-mcp ./digitalocean-mcp-catalog.yaml
+   ```
+   - `my-catalog` is an arbitrary catalog name you choose
+   - `digitalocean-mcp` is the server identifier used inside the gateway
+
+3. **Verify the catalog entry (optional):**
+   ```bash
+   docker mcp catalog list
+   ```
+
+4. **Set your API token in the current shell (examples):**
+   ```bash
+   # macOS / Linux
+   export DIGITALOCEAN_API_TOKEN="your-api-token-here"
+
+   # Windows PowerShell
+   $env:DIGITALOCEAN_API_TOKEN = "your-api-token-here"
+   ```
+
+5. **Launch the MCP gateway using the catalog:**
+   ```bash
+   docker mcp gateway run --catalog my-catalog
+   ```
+   Keep this process running while you use your MCP client. Use `Ctrl+C` to stop the gateway.
+
+6. **Connect your MCP client via Docker Desktop:**
+   - Open Docker Desktop → **MCP Toolkit** → **Clients**
+   - Click **Connect** for your client (e.g., Cursor, Claude Desktop)
+   - Follow any prompts from the client to authorize the gateway
+
+**Tip:** If you prefer running the server via Docker inside the gateway, ensure the `digitalocean-mcp` image is available locally (step 1). The catalog already contains both stdio and Docker runtime definitions.
 
 ## Configuration
 
