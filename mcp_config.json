@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "digitalocean": {
+      "command": "python",
+      "args": ["mcp_server.py"],
+      "env": {
+        "DIGITALOCEAN_API_TOKEN": "your-api-token-here"
+      }
+    }
+  }
+}
+
